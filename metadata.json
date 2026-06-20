@@ -1,0 +1,6 @@
+{
+  "name": "ECOS – Environmental Carbon Optimization System",
+  "description": "A solution that helps individuals understand, track, and reduce their carbon footprint through simple actions and personalized AI-powered insights. Features transit emissions tracking, solar offset projections, real-time air quality monitoring, and a Gemini-powered Eco-Coach.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
