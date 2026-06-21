@@ -154,11 +154,7 @@ npx tsc --noEmit
 Test Files  9 passed (9)
      Tests  68 passed (68)
 
-Coverage:
-  Statements : 90.5%
-  Lines      : 92.4%
-  Functions  : 95.2%
-  Branches   : 77.5%
+
 
 TypeScript: 0 errors
 ```
