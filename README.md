@@ -4,8 +4,9 @@
 
 **Understand, track, and reduce your carbon footprint through simple actions and personalized AI-powered insights.**
 
-[![Tests](https://img.shields.io/badge/tests-67%20passed-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/tests-68%20passed-brightgreen)](#testing)
 [![Coverage](https://img.shields.io/badge/coverage-92%25%20lines-brightgreen)](#testing)
+[![TypeScript](https://img.shields.io/badge/tsc-zero%20errors-blue)](#tech-stack)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](#license)
 
 </div>
@@ -35,17 +36,19 @@ ECOS tackles this by combining **real-time environmental data**, **emissions cal
 ### 🌬️ Real-Time Air Quality Monitoring
 - Live AQI polling with **color-coded status badges** (Good / Moderate / Poor)
 - PM2.5 and PM10 particulate tracking
-- Smart polling — automatically pauses when the browser tab is inactive
+- Smart polling — automatically pauses when the browser tab is inactive (Page Visibility API)
 
-### 🤖 AI Eco-Coach (Gemini 1.5 Flash + Search Grounding)
+### 🤖 AI Eco-Coach (Gemini 2.0 Flash + Search Grounding)
 - **Gemini-powered** conversational sustainability advisor
 - Uses **Google Search Grounding** for real-time, factual responses
+- Sends **personalized context** (your tracked emissions and offsets) with each request
 - **Quick action chips** for common sustainability questions (cycling, composting, recycling, AC reduction)
 - Markdown-rendered responses for structured advice
 
 ### 📊 Carbon Footprint Tracker
 - **Persistent tracking** via localStorage — your calculations survive page refreshes
 - Aggregated dashboard showing total emissions, solar offsets, and calculation history
+- **Net impact indicator** — shows whether you're net positive (green) or net negative (amber)
 - Clear history with one click
 
 ---
@@ -64,24 +67,24 @@ ECOS tackles this by combining **real-time environmental data**, **emissions cal
 │  │         useTrackingHistory (localStorage)       │ │
 │  └─────────────────────┬──────────────────────────┘ │
 │  ┌─────────────────────┴──────────────────────────┐ │
-│  │              CarbonSummary Banner               │ │
+│  │        CarbonSummary (Net Impact Banner)        │ │
 │  └────────────────────────────────────────────────┘ │
 │  ┌────────────────────────────────────────────────┐ │
-│  │     EcoCoach (Chat UI + Quick Action Chips)     │ │
+│  │    EcoCoach (Personalized Context + Chat UI)    │ │
 │  └──────────────────────┬─────────────────────────┘ │
 └─────────────────────────┼───────────────────────────┘
                           │ REST API
 ┌─────────────────────────┼───────────────────────────┐
-│                 Backend (Express.js)                 │
+│              Backend (Express.js + TypeScript)       │
 │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────┐ │
 │  │ Helmet   │ │  CORS    │ │  Rate    │ │ Input  │ │
 │  │ Security │ │  Config  │ │  Limiter │ │ Valid. │ │
 │  └──────────┘ └──────────┘ └──────────┘ └────────┘ │
 │  ┌────────────────────────────────────────────────┐ │
-│  │  /api/transit  │  /api/solar  │  /api/air-quality│
+│  │  /api/transit  │  /api/solar  │ /api/air-quality│ │
 │  └────────────────────────────────────────────────┘ │
 │  ┌────────────────────────────────────────────────┐ │
-│  │    /api/eco-coach → Gemini 1.5 Flash API       │ │
+│  │    /api/eco-coach → Gemini 2.0 Flash API       │ │
 │  │    (Search Grounding + System Instructions)     │ │
 │  └────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────┘
@@ -93,11 +96,11 @@ ECOS tackles this by combining **real-time environmental data**, **emissions cal
 
 | Layer | Technology |
 |-------|-----------|
-| **Frontend** | React 19, TypeScript, Tailwind CSS v4, Motion (Framer Motion) |
-| **Backend** | Express.js, Node.js |
-| **AI** | Google Gemini 1.5 Flash via `@google/genai` SDK |
+| **Frontend** | React 19, TypeScript (strict, zero errors), Tailwind CSS v4, Motion (Framer Motion) |
+| **Backend** | Express.js, Node.js, TypeScript |
+| **AI** | Google Gemini 2.0 Flash via `@google/genai` SDK |
 | **Search** | Google Search Grounding (real-time factual AI responses) |
-| **Security** | Helmet, CORS, express-rate-limit, input validation |
+| **Security** | Helmet, CORS, express-rate-limit, input validation, prompt sanitization |
 | **Testing** | Vitest, React Testing Library, Supertest |
 | **Build** | Vite |
 
@@ -140,31 +143,36 @@ npm test
 
 # Run with coverage report
 npx vitest run --coverage
+
+# TypeScript strict check
+npx tsc --noEmit
 ```
 
 ### Test Results
 
 ```
 Test Files  9 passed (9)
-     Tests  67 passed (67)
+     Tests  68 passed (68)
 
 Coverage:
-  Statements : 90.55%
-  Branches   : 78.47%
-  Functions  : 95.00%
-  Lines      : 92.00%
+  Statements : 90.5%
+  Lines      : 92.4%
+  Functions  : 95.2%
+  Branches   : 77.5%
+
+TypeScript: 0 errors
 ```
 
-| Test Suite | Tests | Coverage |
-|-----------|-------|----------|
-| Server API Routes | 20 | Input validation, error handling, all endpoints |
-| Transit Footprint | 7 | Form submission, error states, a11y, radiogroup |
-| Solar Insight | 6 | Calculations, error states, form semantics |
-| Air Quality | 5 | Polling, status colors, error handling, aria-live |
-| Eco Coach | 8 | Chat flow, quick actions, error handling, a11y |
-| Carbon Summary | 4 | Empty state, populated state, clear history |
-| Tracking History Hook | 10 | CRUD, localStorage, edge cases, corruption |
-| Card Component | 4 | Rendering, a11y attributes, React.memo |
+| Test Suite | Tests | Focus Areas |
+|-----------|-------|-------------|
+| Server API Routes | 20 | Input validation, error handling, all 4 endpoints, edge cases |
+| Transit Footprint | 7 | Form submission, error states, a11y, radiogroup, enter key |
+| Solar Insight | 6 | Calculations, error states, form semantics, validation |
+| Air Quality | 5 | Smart polling, status colors, error handling, aria-live |
+| Eco Coach | 8 | Chat flow, quick actions, error handling, personalized context |
+| Carbon Summary | 5 | Empty state, populated state, net impact, clear history |
+| Tracking History Hook | 10 | CRUD, localStorage, edge cases, corruption handling |
+| Card Component | 4 | Rendering, React.memo, a11y attributes |
 | App Integration | 3 | Layout, skip-nav, landmarks |
 
 ---
@@ -189,9 +197,23 @@ ECOS is built with accessibility as a first-class concern:
 - **Helmet** — secure HTTP headers (X-Content-Type-Options, X-Frame-Options, etc.)
 - **CORS** — configurable origin whitelist (permissive in dev, restrictive in production)
 - **Rate Limiting** — 100 req/15min general, 20 req/15min for AI endpoint
-- **Input Validation** — server-side type checking, range validation, and descriptive 400 errors
+- **Input Validation** — server-side type checking with discriminated union results, range validation, and descriptive 400 errors
 - **Prompt Sanitization** — user input truncated and sanitized before Gemini API interpolation
 - **No Hardcoded Secrets** — API keys loaded exclusively from environment variables
+- **Request Size Limits** — 1MB JSON body limit
+
+---
+
+## 🧱 Code Quality
+
+- **Named Constants** — All magic numbers extracted (`EMISSION_FACTORS`, `SOLAR`, `ICE_BASELINE_KG_PER_KM`, `AQI_MODERATE_THRESHOLD`, `KG_CO2_PER_TREE_YEAR`)
+- **Shared TypeScript Interfaces** — `TransitResult`, `SolarResult`, `AirQualityData`, `ChatMessage` in centralized `types.ts`
+- **Discriminated Union Validation** — Type-safe `ValidationResult = ValidationSuccess | ValidationError`
+- **React.memo** — Pure component memoization on `Card`
+- **useMemo / useCallback** — All computed values and event handlers properly memoized
+- **JSDoc** — Documentation on all exported functions, interfaces, and constants
+- **Zero `tsc --noEmit` errors** — Full strict TypeScript compliance
+- **No unused imports** — Clean dependency graph
 
 ---
 
@@ -199,29 +221,25 @@ ECOS is built with accessibility as a first-class concern:
 
 ```
 ecos/
-├── app.ts                          # Express backend (API routes + security middleware)
+├── app.ts                          # Express backend with named constants + typed APIs
 ├── server.ts                       # Server entry point
 ├── server.test.ts                  # Backend API tests (20 tests)
 ├── index.html                      # HTML entry with SEO meta tags
-├── metadata.json                   # Project metadata
+├── tsconfig.json                   # TypeScript config (strict, vitest/globals)
 ├── package.json                    # Dependencies and scripts
 ├── src/
 │   ├── App.tsx                     # Main layout with CarbonSummary + 2x2 grid
 │   ├── App.test.tsx                # App integration tests
+│   ├── types.ts                    # Shared TypeScript interfaces + constants
 │   ├── index.css                   # Global styles + sr-only utility
 │   ├── components/
 │   │   ├── Card.tsx                # Reusable card (React.memo + aria-labelledby)
-│   │   ├── Card.test.tsx
 │   │   ├── TransitFootprint.tsx    # Transit emissions calculator
-│   │   ├── TransitFootprint.test.tsx
 │   │   ├── SolarInsight.tsx        # Solar offset projector
-│   │   ├── SolarInsight.test.tsx
 │   │   ├── AirQuality.tsx          # Real-time AQI monitor
-│   │   ├── AirQuality.test.tsx
-│   │   ├── EcoCoach.tsx            # Gemini AI chat + quick actions
-│   │   ├── EcoCoach.test.tsx
-│   │   ├── CarbonSummary.tsx       # Tracking dashboard banner
-│   │   └── CarbonSummary.test.tsx
+│   │   ├── EcoCoach.tsx            # Gemini AI chat + personalized context
+│   │   ├── CarbonSummary.tsx       # Tracking dashboard with net impact
+│   │   └── *.test.tsx              # Component tests
 │   └── hooks/
 │       ├── useTrackingHistory.ts   # localStorage tracking persistence
 │       └── useTrackingHistory.test.ts
@@ -234,10 +252,10 @@ ecos/
 | Requirement | Implementation |
 |-------------|---------------|
 | **Understand** carbon footprint | Transit calculator with emission comparisons, Solar offset projections, Real-time AQI data |
-| **Track** carbon footprint | localStorage-based tracking history, CarbonSummary dashboard with aggregated metrics |
-| **Reduce** carbon footprint | AI Eco-Coach with personalized advice, Quick action chips for immediate lifestyle changes |
+| **Track** carbon footprint | localStorage-based tracking history, CarbonSummary dashboard with aggregated metrics, Net impact indicator |
+| **Reduce** carbon footprint | AI Eco-Coach with personalized advice based on tracked data, Quick action chips for immediate lifestyle changes, Net positive/negative feedback loop |
 | **Simple actions** | One-tap quick action chips: "🚲 Switch to cycling", "☀️ Reduce AC usage", "🌱 Start composting", "♻️ Recycling tips" |
-| **Personalized insights** | Gemini 1.5 Flash with Search Grounding provides context-aware, real-time sustainability coaching |
+| **Personalized insights** | Gemini 2.0 Flash receives user's tracked emissions + offset context with each message for tailored recommendations |
 
 ---
 

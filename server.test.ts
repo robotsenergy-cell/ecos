@@ -1,7 +1,7 @@
 // @vitest-environment node
 import request from 'supertest';
 import { app } from './app';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 describe('Server API Routes', () => {
   // === Air Quality ===
